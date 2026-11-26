@@ -35,12 +35,21 @@ export async function apiClient<T>(endpoint: string, options: ApiRequestOptions 
 
   const url = `${ENV.API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
 
+  // Session token saved by authService after /auth/verify-otp or /auth/login
+  let token: string | null = null;
+  try {
+    token = sessionStorage.getItem('vg_auth_token');
+  } catch {
+    token = null;
+  }
+
   try {
     const response = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
       body: body ? JSON.stringify(body) : undefined,

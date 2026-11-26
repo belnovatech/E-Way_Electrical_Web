@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: eway-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: DATABASE_URL
+        sync: false # paste the Neon *direct* (not pooled) url in the dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OCPP_GATEWAY_KEY
+        generateValue: true
+      # no SMS provider yet, so customer login only works in demo mode
+      - key: APP_ENV
+        value: development
+      - key: OTP_DEMO_MODE
+        value: "true"
+      - key: CORS_ORIGINS
+        value: http://localhost:5173,http://localhost:3000
